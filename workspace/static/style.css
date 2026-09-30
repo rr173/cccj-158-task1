@@ -1,0 +1,74 @@
+:root {
+  --bg: #0d1117; --panel: #161b22; --panel2: #1c2530; --line: #2d3742;
+  --text: #e6edf3; --muted: #8b98a5; --accent: #2f81f7; --green: #2ea043;
+  --red: #f85149; --amber: #d29922; --purple: #a371f7;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg); color: var(--text); font-size: 14px; }
+.topbar { display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.brand { font-weight: 700; font-size: 17px; }
+.brand .sub { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 8px; }
+.userbox { display: flex; gap: 10px; align-items: center; }
+.pill { padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+.role.clinician, .pill.clinician { background: #16335f; color: #7db4ff; }
+.role.privacy, .pill.privacy_officer { background: #3c2660; color: #c9a9ff; }
+.role.qc, .pill.qc_reviewer { background: #14402a; color: #7ee2a8; }
+.role.admin, .pill.admin { background: #4a2a2a; color: #ffa198; }
+
+button { background: var(--accent); color: #fff; border: 0; border-radius: 6px;
+  padding: 8px 14px; cursor: pointer; font-size: 13px; margin: 4px 0; }
+button:hover { filter: brightness(1.12); }
+button.danger-btn { background: var(--red); }
+button.link { background: none; color: var(--accent); padding: 2px 6px; }
+button.right { float: right; margin-left: 8px; }
+input, select, textarea { width: 100%; background: var(--panel2); border: 1px solid var(--line);
+  color: var(--text); border-radius: 6px; padding: 8px 10px; margin: 5px 0; }
+textarea { min-height: 64px; font-family: monospace; }
+.row { display: flex; gap: 8px; }
+.hidden { display: none !important; }
+.center { max-width: 640px; margin: 80px auto; text-align: center; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px 18px; margin: 14px 20px; }
+.card.danger { border-color: #5b2526; }
+.card h3 { margin: 0 0 12px; font-size: 15px; }
+.card h4 { margin: 12px 0 6px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.hint { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.roles { display: flex; gap: 12px; justify-content: center; margin-top: 18px; }
+.role { width: 130px; padding: 16px 8px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--panel2); color: var(--text); line-height: 1.6; }
+.role small { color: var(--muted); }
+
+.tabs { display: flex; gap: 4px; padding: 12px 20px 0; flex-wrap: wrap; }
+.tab { background: var(--panel2); color: var(--muted); border: 1px solid var(--line);
+  border-bottom: none; border-radius: 8px 8px 0 0; }
+.tab.active { color: var(--text); background: var(--panel); position: relative; top: 1px; }
+.danger-tab { border-color: #5b2526; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+th, td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; }
+.status { padding: 2px 8px; border-radius: 10px; font-size: 11px; white-space: nowrap; }
+.s-pending_qc, .s-queued, .s-leased { background: #3d2e08; color: var(--amber); }
+.s-published, .s-succeeded { background: #14402a; color: #7ee2a8; }
+.s-rejected, .s-failed, .s-dead { background: #4a1d1d; color: #ff9492; }
+.s-active { background: #14402a; color: #7ee2a8; }
+.s-exported { background: #16335f; color: #7db4ff; }
+.s-revoked, .s-expired { background: #333; color: var(--muted); }
+
+.blocker { color: var(--red); } .warning { color: var(--amber); } .info { color: var(--muted); }
+.steps { font-family: ui-monospace, monospace; font-size: 12px; background: var(--panel2);
+  border-radius: 8px; padding: 10px; max-height: 280px; overflow: auto; white-space: pre-wrap; }
+.identity { background: #1a1215; border: 1px solid #5b2526; border-radius: 8px; padding: 12px;
+  font-size: 12px; color: #ffd7d5; white-space: pre-wrap; }
+.audit { font-family: ui-monospace, monospace; font-size: 12px; max-height: 60vh; overflow: auto; }
+.audit tr td { font-size: 11px; }
+.ok { color: var(--green); } .bad { color: var(--red); }
+.rulebox { border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 8px; }
+.tokenbox { word-break: break-all; background: var(--panel2); border-radius: 6px; padding: 8px;
+  font-family: monospace; font-size: 12px; color: var(--amber); }
+.vchain { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.vnode { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 12px; }

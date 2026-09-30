@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MedIdx · 医学影像去标识化与受控回链平台</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">🩻 MedIdx <span class="sub">影像去标识化 · 受控回链</span></div>
+  <div id="userbox" class="userbox"></div>
+</header>
+
+<!-- 登录 -->
+<section id="login" class="card center hidden">
+  <h2>登录（演示环境免密）</h2>
+  <div class="roles">
+    <button data-user="clinic.zhang" class="role clinician">张医生<br><small>临床医生</small></button>
+    <button data-user="privacy.li" class="role privacy">李隐私官<br><small>隐私官</small></button>
+    <button data-user="qc.wang" class="role qc">王质检医生<br><small>质检</small></button>
+    <button data-user="admin.chen" class="role admin">陈管理员<br><small>管理员</small></button>
+  </div>
+</section>
+
+<!-- 主界面 -->
+<main id="app" class="hidden">
+  <nav class="tabs">
+    <button data-tab="ingest" class="tab active">① 入库与影像</button>
+    <button data-tab="queue" class="tab">② 处理队列</button>
+    <button data-tab="qc" class="tab">③ 质检发布</button>
+    <button data-tab="policies" class="tab">策略版本</button>
+    <button data-tab="relink" class="tab danger-tab">④ 受控回链</button>
+    <button data-tab="audit" class="tab">审计</button>
+  </nav>
+
+  <!-- 入库 -->
+  <section id="tab-ingest" class="tabpane">
+    <div class="grid2">
+      <div class="card">
+        <h3>新建项目</h3>
+        <input id="pname" placeholder="项目名称（如 DEMO-NEURO）">
+        <input id="pdesc" placeholder="项目描述">
+        <button onclick="App.createProject()">创建项目</button>
+        <p class="hint">管理员或任何登录用户可建演示项目。</p>
+      </div>
+      <div class="card">
+        <h3>影像入库（冻结 + 派生 v1）</h3>
+        <select id="ingestProject"></select>
+        <input type="file" id="dicomFile">
+        <button onclick="App.ingest()">入库并冻结</button>
+        <p class="hint">支持 DICOM-JSON（.json）与显式 VR LE DICOM（.dcm）。
+          入库瞬间 HMAC 封口原始摘要，之后永不被覆盖。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>项目与影像</h3>
+      <div id="projects"></div>
+    </div>
+  </section>
+
+  <!-- 队列 -->
+  <section id="tab-queue" class="tabpane hidden">
+    <div class="card">
+      <h3>处理队列 <button onclick="App.pump(10)" class="right">▶ 运行 Worker（处理 10 个）</button></h3>
+      <div id="queue"></div>
+      <p class="hint">瞬时遮盖故障按指数退避自动重试；超过 3 次进死信，需人工"批量重试"。
+        死信/失败期间版本永远无工件，不能发布。</p>
+    </div>
+  </section>
+
+  <!-- 质检 -->
+  <section id="tab-qc" class="tabpane hidden">
+    <div class="card">
+      <h3>待质检版本（自动质检无 blocker）</h3>
+      <div id="qcPending"></div>
+    </div>
+    <div id="qcDetail" class="card hidden">
+      <button class="right link" onclick="App.closeQc()">✕ 关闭详情</button>
+      <h3>版本质检详情</h3>
+      <div id="qcDetailBody"></div>
+    </div>
+  </section>
+
+  <!-- 策略 -->
+  <section id="tab-policies" class="tabpane hidden">
+    <div class="card">
+      <h3>项目策略（只增版本）</h3>
+      <select id="policyProject"></select>
+      <div id="policyList"></div>
+      <div class="rulebox">
+        <h4>新建策略版本</h4>
+        <input id="policyName" value="NEURO-DEID" placeholder="策略名（同名则 version+1）">
+        <select id="baseVersion"><option value="1">基于内置 v1 规则</option><option value="2">基于内置 v2（更严格）</option></select>
+        <input id="policyNotes" placeholder="升级说明（为什么升级）">
+        <button onclick="App.createPolicy()">创建新版本（不改写旧版）</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 回链 -->
+  <section id="tab-relink" class="tabpane hidden">
+    <div class="grid2">
+      <div class="card danger">
+        <h3>申请双角色回链授权</h3>
+        <select id="grantImage"></select>
+        <input id="grantPurpose" placeholder="目的，如：临床纠错-核对用药史">
+        <label>时间窗（UTC）</label>
+        <div class="row"><input id="winStart" placeholder="2026-09-30T14:00">
+          <input id="winEnd" placeholder="2026-09-30T15:00"></div>
+        <select id="grantApprover">
+          <option value="privacy.li">审批：李隐私官</option>
+        </select>
+        <button class="danger-btn" onclick="App.createGrant()">临床医生申请 + 隐私官审批</button>
+        <div id="grantResult"></div>
+      </div>
+      <div class="card danger">
+        <h3>一次性导出原身份</h3>
+        <textarea id="redeemToken" placeholder="粘贴授权返回的一次性令牌"></textarea>
+        <button class="danger-btn" onclick="App.redeem()">领取（导出后立即失效）</button>
+        <pre id="redeemResult" class="identity"></pre>
+      </div>
+    </div>
+    <div class="card danger">
+      <h3>授权登记与撤销（隐私官/管理员）</h3>
+      <div id="grants"></div>
+    </div>
+  </section>
+
+  <!-- 审计 -->
+  <section id="tab-audit" class="tabpane hidden">
+    <div class="card">
+      <h3>哈希链审计
+        <button class="right" onclick="App.verifyAudit()">🔍 校验哈希链完整性</button>
+        <button class="right" onclick="App.exportAudit()">⬇ 导出 CSV</button>
+      </h3>
+      <div id="auditStatus"></div>
+      <div id="auditEvents" class="audit"></div>
+    </div>
+  </section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>
